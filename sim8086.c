@@ -195,10 +195,43 @@ struct Instruction createMoveInstructionImmediateToReg(int W, int *REG,
                reg_full_w1[j]);
       }
     }
+
+    if (data[0] == 1) {
+      // Transform every 1 -> 0 and 0 -> 1
+      for (int i = 0; i < 16; ++i) {
+        data[i] = data[i] == 0 ? 1 : 0;
+      }
+
+      negative_number = true;
+    }
+
+    bool not_used_last_bit = true;
+
+    for (int j = 15; j != 7; --j) {
+      if (data[j] == 1) {
+        not_used_last_bit = false;
+        break;
+      }
+    }
+
+    printf("Not used last bit, %d\n", not_used_last_bit ? 1 : 0);
+
     // Get data
-    for (int j = 15; j != 0; --j) {
+    for (int j = 7; j >= 0; --j) {
+      printf("Data[%d]=%d\n", j, data[j]);
+      printf("Number : %d\n", number);
       number = number + (data[j] * pow(2, power));
       power++;
+    }
+
+    printf("Second half\n");
+    if (!not_used_last_bit) {
+      for (int j = 15; j != 7; --j) {
+        printf("Data[%d]=%d\n", j, data[j]);
+        printf("Number : %d\n", number);
+        number = number + (data[j] * pow(2, power));
+        power++;
+      }
     }
 
   } else {
@@ -223,6 +256,8 @@ struct Instruction createMoveInstructionImmediateToReg(int W, int *REG,
 
     // Get data
     for (int j = 7; j != 0; --j) {
+      printf("Data[%d]=%d\n", j, data[j]);
+      printf("Number : %d\n", number);
       number = number + (data[j] * pow(2, power));
       power++;
     }
