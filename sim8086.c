@@ -1,3 +1,4 @@
+#include <locale.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -184,6 +185,7 @@ struct Instruction createMoveInstructionImmediateToReg(int W, int *REG,
 
   int number = 0;
   int power = 0;
+  bool negative_number = false;
   if (W == 1) {
     instruction.w = 1;
     // Get REG
@@ -208,17 +210,27 @@ struct Instruction createMoveInstructionImmediateToReg(int W, int *REG,
                reg_full_w0[j]);
       }
     }
+
+    // Handle when the number is negative
+    if (data[0] == 1) {
+      // Transform every 1 -> 0 and 0 -> 1
+      for (int i = 0; i < 8; ++i) {
+        data[i] = data[i] == 0 ? 1 : 0;
+      }
+
+      negative_number = true;
+    }
+
     // Get data
     for (int j = 7; j != 0; --j) {
       number = number + (data[j] * pow(2, power));
-      printf("Data[%d]=%d\n", j, data[j]);
-      printf("Number : %d\n", number);
       power++;
     }
   };
 
   printf("Number :%d", number);
-  instruction.type_of_instruction.immediate_to_reg.data = number;
+  instruction.type_of_instruction.immediate_to_reg.data =
+      negative_number ? -(++number) : number;
   return instruction;
 }
 
